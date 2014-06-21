@@ -1,0 +1,3 @@
+#gfve-entry-details .gfve-field-label { font-weight: bold; }
+#gfve-entry-details .gfve-field-label:after { content: ': '; }
+#gfve-entry-details .gfve-field-val + .gfve-field-val:before { content: ', '; }
