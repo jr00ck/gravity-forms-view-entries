@@ -40,8 +40,8 @@ function gf_view_entries_shortcode( $params ) {
 	if( !is_array($entry) ){
     	$entry_html = '<div id="gfve-error">There was an error retrieving this entry. Please try again later.</div>';
 	} else {
-		$form = GFAPI::get_form($form_id);
-		$entry_html .= gfve_display_profile($entry, $form);
+		$form = GFAPI::get_form($entry['form_id']);
+		$entry_html = gfve_display_profile($entry, $form);
 	}
 
 	return $entry_html;
@@ -60,13 +60,12 @@ function gfve_display_profile($entry, $form){
 		if($entry[$key]){
 			if($value != $last_label){
 				// close previous div before starting new label
-				if($last_label) { $entry_html .= '</div>'; }
+				if($last_label !== '') { $entry_html .= '</div>'; }
 				$entry_html .= '<div class="gfve-entry-field"><span class="gfve-field-label">' . $value . '</span>';
 			}
 			$entry_html .= '<span class="gfve-field-val">' . $entry[$key] . '</span>';
+			$last_label = $value;
 		}
-
-		$last_label = $value;
 	}
 
 	if($entry_html){
