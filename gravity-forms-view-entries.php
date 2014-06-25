@@ -3,13 +3,13 @@
 Plugin Name: Gravity Form View Entries
 Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
 Description: Allows viewing Gravity Forms entries on your site using shortcodes. Uses [gf-view-entries] shortcode.
-Version: 1.0
+Version: 1.1
 Author: FreeUp
 Author URI: http://freeupwebstudio.com
 Author Email: jeremy@freeupwebstudio.com
 */
 
-$plugin_ver = '1.0';
+$plugin_ver = '1.1';
 
 /* Load styles */
 add_action( 'wp_enqueue_scripts', 'gfve_styles' );
@@ -26,28 +26,32 @@ function gf_view_entries_shortcode( $params ) {
 
 	extract( shortcode_atts( array(
                     'form_id'		=> '',
-                    'exclude'		=> null
+                    'entry_id'		=> '',
+                    'exclude_fields'=> null,
+                    'error'			=> 'There was an error retrieving this entry. Please try again later.'
                 ), $params ) );
 
-	if( is_numeric($_GET['eid']) ){
+	if( is_numeric($_GET['entry_id']) || $entry_id ){
 		
-		$entry_id = $_GET['eid'];
+		$entry_id = $entry_id ? $entry_id : $_GET['entry_id'];
 
 		// get entry by ID
 		$entry = GFAPI::get_entry($entry_id);
 	}
 	
 	if( !is_array($entry) ){
-    	$entry_html = '<div id="gfve-error">There was an error retrieving this entry. Please try again later.</div>';
+    	$entry_html = '<div id="gfve-error">' . $error . '</div>';
 	} else {
 		$form = GFAPI::get_form($entry['form_id']);
-		$entry_html = gfve_display_profile($entry, $form);
+		// check for fields to exclude
+		$exclude_fields = explode(',', $exclude_fields);
+		$entry_html = gfve_display_profile($entry, $form, $exclude_fields);
 	}
 
 	return $entry_html;
 }
 
-function gfve_display_profile($entry, $form){
+function gfve_display_profile($entry, $form, $exclude_fields = null){
 
 	// get all field labels & IDs into a single-dimensional array
 	$fields = gfve_get_fields($form);
@@ -58,13 +62,16 @@ function gfve_display_profile($entry, $form){
 	foreach ($fields as $key => $value) {
 		
 		if($entry[$key]){
-			if($value != $last_label){
-				// close previous div before starting new label
-				if($last_label !== '') { $entry_html .= '</div>'; }
-				$entry_html .= '<div class="gfve-entry-field"><span class="gfve-field-label">' . $value . '</span>';
+			// only show if this field should not be excluded
+			if(!in_array($key, $exclude_fields)){
+				if($value != $last_label){
+					// close previous div before starting new label
+					if($last_label !== '') { $entry_html .= '</div>'; }
+					$entry_html .= '<div class="gfve-entry-field"><span class="gfve-field-label">' . $value . '</span>';
+				}
+				$entry_html .= '<span class="gfve-field-val">' . $entry[$key] . '</span>';
+				$last_label = $value;
 			}
-			$entry_html .= '<span class="gfve-field-val">' . $entry[$key] . '</span>';
-			$last_label = $value;
 		}
 	}
 
