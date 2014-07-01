@@ -2,14 +2,14 @@
 /*
 Plugin Name: Gravity Form View Entries
 Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
-Description: Allows viewing Gravity Forms entries on your site using shortcodes. Uses [gf-view-entries] shortcode.
-Version: 1.1
+Description: Allows viewing Gravity Forms entries on your site using shortcodes. Uses [gf-view-entries] shortcode. Also provides a link to view an entry using [gf-view-entries-link] shortcode.
+Version: 1.3
 Author: FreeUp
 Author URI: http://freeupwebstudio.com
 Author Email: jeremy@freeupwebstudio.com
 */
 
-$plugin_ver = '1.1';
+$plugin_ver = '1.3';
 
 /* Load styles */
 add_action( 'wp_enqueue_scripts', 'gfve_styles' );
@@ -17,7 +17,6 @@ add_action( 'wp_enqueue_scripts', 'gfve_styles' );
 function gfve_styles() {
     wp_enqueue_style( 'gfve-styles', plugins_url( '/gravity-forms-view-entries.css' , __FILE__ ), array(), $plugin_ver );
 }
-
 
 // shortcode [gf-view-entries]
 add_shortcode('gf-view-entries', 'gf_view_entries_shortcode');
@@ -28,7 +27,9 @@ function gf_view_entries_shortcode( $params ) {
                     'form_id'		=> '',
                     'entry_id'		=> '',
                     'exclude_fields'=> null,
-                    'error'			=> 'There was an error retrieving this entry. Please try again later.'
+                    'error'			=> 'There was an error retrieving this entry. Please try again later.',
+                    'key'			=> '',
+                    'value'			=> ''
                 ), $params ) );
 
 	if( is_numeric($_GET['entry_id']) || $entry_id ){
@@ -95,4 +96,44 @@ function gfve_get_fields($form){
 		}
 	}
 	return $fields;
+}
+
+
+// shortcode [gf-view-entries-link]
+add_shortcode('gf-view-entries-link', 'gf_view_entries_link_shortcode');
+
+function gf_view_entries_link_shortcode( $params, $content = NULL ) {
+
+	extract( shortcode_atts( array(
+					'entry_id'		=> '',
+                    'url'			=> '',
+                    'form_id'		=> '',
+                    'key'			=> '',
+                    'value'			=> '',
+                    'button'		=> ''
+                ), $params ) );
+
+	if($entry_id && $url){
+		$view_link = $url . '?entry_id=' . $entry_id;
+	} elseif($url && $form_id && $key && $value){
+		//if trying to get current user by username
+		if($value="current_username") {
+			global $current_user;
+			get_currentuserinfo();
+			$value = $current_user->user_login;
+		}
+		// setup search criteria
+		$search_criteria['field_filters'][] = array( 'key' => $key, 'value' => $value );
+		// run query
+    	$entry = GFAPI::get_entries($form_id, $search_criteria);
+    	
+		$view_link = $url . '?entry_id=' . $entry[0]['id'];
+
+		if($button){
+			$view_link = '<a class="icon-button ' . $button . '" href="' . $view_link . '">' . $content . '<span class="et-icon"></span></a>';
+		}
+	}
+
+	return $view_link;
+
 }
