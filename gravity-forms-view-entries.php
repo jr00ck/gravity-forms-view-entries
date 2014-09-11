@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Gravity Form View Entries
+Plugin Name: Gravity Forms View Entries
 Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
 Description: Allows viewing Gravity Forms entries on your site using shortcodes. Uses [gf-view-entries] shortcode. Also provides a link to view an entry using [gf-view-entries-link] shortcode.
-Version: 1.3
+Version: 1.3.1
 Author: FreeUp
 Author URI: http://freeupwebstudio.com
 Author Email: jeremy@freeupwebstudio.com
@@ -117,7 +117,7 @@ function gf_view_entries_link_shortcode( $params, $content = NULL ) {
 		$view_link = $url . '?entry_id=' . $entry_id;
 	} elseif($url && $form_id && $key && $value){
 		//if trying to get current user by username
-		if($value="current_username") {
+		if($value=="current_username") {
 			global $current_user;
 			get_currentuserinfo();
 			$value = $current_user->user_login;
