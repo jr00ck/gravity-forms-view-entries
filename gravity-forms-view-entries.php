@@ -3,13 +3,14 @@
 Plugin Name: Gravity Forms View Entries
 Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
 Description: Allows viewing Gravity Forms entries on your site using shortcodes. Uses [gf-view-entries] shortcode. Also provides a link to view an entry using [gf-view-entries-link] shortcode.
-Version: 1.3.1
+Version: 1.3.2
 Author: FreeUp
 Author URI: http://freeupwebstudio.com
 Author Email: jeremy@freeupwebstudio.com
+GitHub Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
 */
 
-$plugin_ver = '1.3';
+$plugin_ver = '1.3.2';
 
 /* Load styles */
 add_action( 'wp_enqueue_scripts', 'gfve_styles' );
