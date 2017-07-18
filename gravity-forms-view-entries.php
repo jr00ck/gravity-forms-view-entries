@@ -92,7 +92,7 @@ function gfve_display_profile($entry, $form, $exclude_fields = null, $include_no
 				
 		if ( sizeof( $notes ) > 0 ) {
 		
-			$entry_html .= '<div class="gfve-entry-field"><span class="gfve-field-label">Notes</span>';
+			$entry_html .= '<div class="gfve-entry-field gfve-notes-field"><span class="gfve-field-label">Notes</span>';
 
 			foreach ( $notes as $note ) {
 			
