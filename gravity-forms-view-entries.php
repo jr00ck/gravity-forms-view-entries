@@ -3,14 +3,14 @@
 Plugin Name: Gravity Forms View Entries
 Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
 Description: Allows viewing Gravity Forms entries on your site using shortcodes. Uses [gf-view-entries] shortcode. Also provides a link to view an entry using [gf-view-entries-link] shortcode.
-Version: 1.3.2
+Version: 1.3.3
 Author: FreeUp
 Author URI: http://freeupwebstudio.com
 Author Email: jeremy@freeupwebstudio.com
 GitHub Plugin URI: https://github.com/jr00ck/gravity-forms-view-entries
 */
 
-$plugin_ver = '1.3.2';
+$plugin_ver = '1.3.3';
 
 /* Load styles */
 add_action( 'wp_enqueue_scripts', 'gfve_styles' );
@@ -136,5 +136,54 @@ function gf_view_entries_link_shortcode( $params, $content = NULL ) {
 	}
 
 	return $view_link;
+
+}
+
+
+
+// shortcode [gf-view-entries-list]
+add_shortcode('gf-view-entries-list', 'gf_view_entries_list_shortcode');
+
+function gf_view_entries_list_shortcode( $params, $content = NULL ) {
+
+	extract( shortcode_atts( array(
+					'form_id'		=> '',
+                    'key'			=> '',
+                    'value'			=> '',                    
+                ), $params ) );
+
+	$view_list = '';
+
+	if( $form_id && is_numeric( $form_id ) ){
+		
+		$search_criteria = array();
+
+		if( $key && $value ){
+
+			//if trying to get current user by username
+			if($value=="current_username") {
+				global $current_user;
+				get_currentuserinfo();
+				$value = $current_user->user_login;
+			}
+			// setup search criteria
+			$search_criteria['field_filters'][] = array( 'key' => $key, 'value' => $value );
+
+		}
+		
+		// run query
+    	$entries = GFAPI::get_entries($form_id, $search_criteria);
+    	
+    	if( $entries ){
+    		$view_list .= '<ul>';
+    		foreach($entries as $entry){
+				$view_list .= '<li>'.$entry['id'].'</li>';;
+			}
+			$view_list .= '</ul>';
+    	}
+		
+	}
+
+	return $view_list;
 
 }
