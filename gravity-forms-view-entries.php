@@ -78,6 +78,8 @@ function gfve_display_profile($entry, $form, $exclude_fields = null, $include_no
 	}
 
 	if($include_notes){
+		// close fields div
+		$entry_html .= '</div>';
 
 		$values = array();	
     	$notes = RGFormsModel::get_lead_notes( $entry['id'] );
@@ -104,18 +106,23 @@ function gfve_display_profile($entry, $form, $exclude_fields = null, $include_no
 				$name = $author->first_name . ' ' . $author->last_name;
 				
 				// $values[] = sprintf($format, $date, $username, $emailaddress, $content, $userid, $noteid, $name);    
-				
+				$entry_html .= '<div class="gfve-notes-entry">';
 				$entry_html .= '<span class="gfve-field-val">' . $date . '</span>';
 				$entry_html .= '<span class="gfve-field-val">' . $username . '</span>';
 	        	$entry_html .= '<span class="gfve-field-val">' . $content . '</span>';
-    	    	
+    	    	$entry_html .= '</div>';
 			}
 
 			$entry_html .= '</div>';
 		}
 
 
+	}else{
+		// close fields div
+		$entry_html .= '</div>';
 	}
+	
+	
 
 	if($entry_html){
 		$entry_html = '<div id="gfve-entry-details">' . $entry_html . '</div>';
@@ -217,13 +224,13 @@ function gf_view_entries_list_shortcode( $params, $content = NULL ) {
     	$form = GFAPI::get_form($form_id);
 
     	if( $entries ){
-    		$view_list .= '<ul>';
+    		$view_list .= '<div class="gfve-entries-list">';
     		foreach($entries as $entry){
-				$view_list .= '<li class="entry-id-'.$entry['id'].'">';
+				$view_list .= '<div class="entry-id-'.$entry['id'].'">';
 				$view_list .= gfve_display_profile($entry, $form, $exclude_fields, $include_notes);
-				$view_list .= '</li>';;
+				$view_list .= '</div>';;
 			}
-			$view_list .= '</ul>';
+			$view_list .= '</div>';
     	}
 		
 	}
